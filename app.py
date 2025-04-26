@@ -1,5 +1,4 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 import numpy as np
 
 # Sidebar for navigation
@@ -22,16 +21,15 @@ elif page == "Graphics":
     st.write("Here is a simple sine wave plot:")
 
     # Generate data for the plot
+    import pandas as pd
     x = np.linspace(0, 10, 100)
     y = np.sin(x)
 
-    # Create the plot
-    fig, ax = plt.subplots()
-    ax.plot(x, y, label="Sine Wave")
-    ax.set_title("Sine Wave")
-    ax.set_xlabel("x-axis")
-    ax.set_ylabel("y-axis")
-    ax.legend()
+    # Create a DataFrame for Streamlit's line_chart
+    data = pd.DataFrame({'x': x, 'Sine Wave': y})
+
+    # Display the plot using Streamlit's line_chart
+    st.line_chart(data.set_index('x'))
 
     # Display the plot in Streamlit
     st.pyplot(fig)

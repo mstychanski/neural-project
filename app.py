@@ -32,9 +32,9 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        assistant_response = client.chat.completions(
-            model = st.secrets["MODEL"],
-            messages = st.session_state.messages
+        assistant_response = client.chat.create(
+            model=st.secrets["MODEL"],
+            messages=st.session_state.messages
         )
         
         # Simulate stream of response with milliseconds delay

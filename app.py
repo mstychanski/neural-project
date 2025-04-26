@@ -9,7 +9,7 @@ st.caption("Note that this demo app isn't actually connected to any LLMs. Those 
 
 
 
-client = OpenAI(st.secrets["API_KEY"], st.secrets["BASE_URL"])
+client = OpenAI(api_key = st.secrets["API_KEY"], base_url=st.secrets["BASE_URL"])
 
 # Initialize chat history
 if "messages" not in st.session_state:

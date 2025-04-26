@@ -1,35 +1,48 @@
 import streamlit as st
-import numpy as np
+import random
+import time
+from openai import OpenAI
 
-# Sidebar for navigation
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Graphics"])
+st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
 
-# Home Page
-if page == "Home":
-    st.title("Welcome to the Streamlit App")
-    st.write("This is a simple app with multiple pages and some graphics.")
-    st.image(
-        "https://streamlit.io/images/brand/streamlit-logo-secondary-colormark-darktext.png",
-        width=300,
-    )
-    st.write("Use the sidebar to navigate between pages.")
+st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
 
-# Graphics Page
-elif page == "Graphics":
-    st.title("Graphics Page")
-    st.write("Here is a simple sine wave plot:")
 
-    # Generate data for the plot
-    import pandas as pd
-    x = np.linspace(0, 10, 100)
-    y = np.sin(x)
 
-    # Create a DataFrame for Streamlit's line_chart
-    data = pd.DataFrame({'x': x, 'Sine Wave': y})
+client = OpenAI(st.secrets["API_KEY"], st.secrets["BASE_URL"])
 
-    # Display the plot using Streamlit's line_chart
-    st.line_chart(data.set_index('x'))
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = [{"role": "assistant", "content": "Let's start chatting! 👇"}]
 
-    # Display the plot in Streamlit
-    st.pyplot(fig)
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# Accept user input
+if prompt := st.chat_input("What is up?"):
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Display user message in chat message container
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # Display assistant response in chat message container
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        assistant_response = random.choice(client.chat.completions(
+            model = st.secrets["MODEL"],
+            messages = st.session_state.messages
+        )
+        )
+        # Simulate stream of response with milliseconds delay
+        for chunk in assistant_response.split():
+            full_response += chunk + " "
+            time.sleep(0.05)
+            # Add a blinking cursor to simulate typing
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    # Add assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": full_response})

@@ -31,6 +31,12 @@ if prompt := st.chat_input("What is up?"):
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
+
+ # Show waiting dots animation
+        for i in range(5):  # Adjust the range for longer/shorter animations
+            message_placeholder.markdown("Thinking" + "." * (i % 4))
+            time.sleep(0.5)
+
         assistant_response = client.chat.completions.create(
             model=st.secrets["MODEL"],
             messages=st.session_state.messages

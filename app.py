@@ -31,12 +31,11 @@ if prompt := st.chat_input("What is up?"):
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ""
         assistant_response = client.chat.completions.create(
             model=st.secrets["MODEL"],
             messages=st.session_state.messages
-        ).choices[0].message.content
-        
+        )
+        full_response = assistant_response.choices[0].message.content
         message_placeholder.markdown(full_response)
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": full_response})

@@ -35,7 +35,7 @@ if prompt := st.chat_input("What is up?"):
         assistant_response = client.chat.completions.create(
             model=st.secrets["MODEL"],
             messages=st.session_state.messages
-        )
+        ).choices[0].message.content
         
         message_placeholder.markdown(full_response)
     # Add assistant response to chat history

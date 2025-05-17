@@ -30,7 +30,8 @@ if prompt := st.chat_input("What is up?"):
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        print(f"User: {prompt}")
+        st.write("Thinking...")
+        
         # Poprawiona inicjalizacja ChatOpenAI
         chat = ChatOpenRouter(
             model_name=st.secrets["MODEL"],
@@ -64,7 +65,7 @@ if prompt := st.chat_input("What is up?"):
             response = answer_question(prompt, retrieved_docs, chat, template)     
             st.session_state.messages.append({"role": "assistant", "content": response})
             # write to console
-            print(f"Assistant: {response}")
+            st.write(f"Assistant: {response}")
             st.chat_message("assistant").write(response)
 with st.sidebar:
     st.header("Menu")

@@ -1,6 +1,5 @@
 openai
 PyMuPDF
-langchain-community
 HuggingFaceEmbeddings
 Faiss
 langchain_openai

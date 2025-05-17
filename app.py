@@ -36,14 +36,8 @@ if prompt := st.chat_input("What is up?"):
             time.sleep(0.5)
 
         # Poprawiona inicjalizacja ChatOpenAI
-        openAi = ChatOpenAI(
-            model=st.secrets["MODEL"],
-            temperature=0,
-            max_tokens=None,
-            timeout=None,
-            max_retries=2,
-            openai_api_key=st.secrets["API_KEY"],
-            base_url=st.secrets["BASE_URL"]
+        chat = ChatOpenRouter(
+            model_name=st.secrets["MODEL"],
         )
         # Jeśli są pliki PDF, użyj embeddingów i retrieval
         if uploaded_files:
@@ -69,25 +63,14 @@ if prompt := st.chat_input("What is up?"):
                 """
             prompt_text = template.format(context=context, question=prompt)
 
-            # Użycie ChatOpenRouter do wygenerowania odpowiedzi
 
-            chat = ChatOpenRouter(openAi
-            )
+            
             response = chat.chat.completions.create(
                 model=st.secrets["MODEL"],
                 messages=[{"role": "user", "content": prompt_text}]
             )
             full_response = response.choices[0].message.content
-        else:
-            # Fallback do klasycznego OpenAI
 
-            client = ChatOpenRouter(openAi
-            )
-            assistant_response = client.chat.completions.create(
-                model=st.secrets["MODEL"],
-                messages=[{"role": "user", "content": prompt}]
-            )
-            full_response = assistant_response.choices[0].message.content
 
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})

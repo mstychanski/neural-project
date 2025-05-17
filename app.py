@@ -49,8 +49,8 @@ if prompt := st.chat_input("What is up?"):
                     st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")
 
             # Tworzenie indeksu FAISS i retrieval
-            index = FAISSIndex.create_index(documents)
-            retrieved_docs = embedder.retrieve_docs(prompt, index)
+            index = create_index(documents)
+            retrieved_docs = retrieve_docs(prompt, index)
             context = "\n\n".join([doc["text"] for doc in retrieved_docs if doc.get("text")])
 
             template = """
@@ -62,11 +62,8 @@ if prompt := st.chat_input("What is up?"):
                 """
 
             response = answer_question(prompt, retrieved_docs, chat, template)     
-        
-            message_placeholder.markdown(response.content)
-
             st.session_state.messages.append({"role": "assistant", "content": response})
-
+            st.chat_message("assistant").write(response)
 with st.sidebar:
     st.header("Menu")
     uploaded_files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)

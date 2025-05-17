@@ -14,27 +14,27 @@ class FAISSIndex:
             results.append(self.metadata[idx])
         return results
 
-    embed_model_id = 'intfloat/e5-small-v2'
-    model_kwargs = {"device": "cpu", "trust_remote_code": True}
+embed_model_id = 'intfloat/e5-small-v2'
+model_kwargs = {"device": "cpu", "trust_remote_code": True}
 
-    def create_index(documents):
-        embeddings = HuggingFaceEmbeddings(model_name=embed_model_id, model_kwargs=model_kwargs)
-        texts = [doc["text"] for doc in documents]
-        metadata = [{"filename": doc["filename"], "text": doc["text"]} for doc in documents]
+def create_index(documents):
+    embeddings = HuggingFaceEmbeddings(model_name=embed_model_id, model_kwargs=model_kwargs)
+    texts = [doc["text"] for doc in documents]
+    metadata = [{"filename": doc["filename"], "text": doc["text"]} for doc in documents]
 
-        # Generate embeddings
-        embeddings_matrix = [embeddings.embed_query(text) for text in texts]
-        embeddings_matrix = np.array(embeddings_matrix).astype("float32")
+    # Generate embeddings
+    embeddings_matrix = [embeddings.embed_query(text) for text in texts]
+    embeddings_matrix = np.array(embeddings_matrix).astype("float32")
 
-        # Create FAISS index
-        index = faiss.IndexFlatL2(embeddings_matrix.shape[1])
-        index.add(embeddings_matrix)
+    # Create FAISS index
+    index = faiss.IndexFlatL2(embeddings_matrix.shape[1])
+    index.add(embeddings_matrix)
 
-        # Return a FAISSIndex object that contains both the index and metadata
-        return FAISSIndex(index, metadata)
+    # Return a FAISSIndex object that contains both the index and metadata
+    return FAISSIndex(index, metadata)
 
-    def retrieve_docs(query, faiss_index, k=3):
-        embeddings = HuggingFaceEmbeddings(model_name=embed_model_id, model_kwargs=model_kwargs)
-        query_embedding = np.array([embeddings.embed_query(query)]).astype("float32")
-        results = faiss_index.similarity_search(query_embedding, k=k)
-        return results
+def retrieve_docs(query, faiss_index, k=3):
+    embeddings = HuggingFaceEmbeddings(model_name=embed_model_id, model_kwargs=model_kwargs)
+    query_embedding = np.array([embeddings.embed_query(query)]).astype("float32")
+    results = faiss_index.similarity_search(query_embedding, k=k)
+    return results

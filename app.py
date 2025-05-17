@@ -62,11 +62,7 @@ if prompt := st.chat_input("What is up?"):
                 """
 
             response = answer_question(prompt, retrieved_docs, chat, template)     
-            
-
-
-        message_placeholder.markdown(response)
-    st.session_state.messages.append({"role": "assistant", "content": response})
+            st.session_state.messages.append({"role": "assistant", "content": response})
 
 with st.sidebar:
     st.header("Menu")

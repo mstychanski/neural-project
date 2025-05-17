@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import time
 from openai import OpenAI
-from PyPDF2 import PdfReader  # Dodano do obsługi PDF
+import fitz  # zamiast PyPDF2
 
 st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
 
@@ -53,13 +53,13 @@ with st.sidebar:
     uploaded_file = st.file_uploader("Wgraj plik PDF", type=["pdf"])
     if uploaded_file is not None:
         try:
-            pdf_reader = PdfReader(uploaded_file)
-            num_pages = len(pdf_reader.pages)
+            pdf_doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+            num_pages = pdf_doc.page_count
             st.success(f"Plik PDF został wczytany. Liczba stron: {num_pages}")
             # Przykładowo: wyświetl tekst z pierwszej strony
             if num_pages > 0:
-                first_page = pdf_reader.pages[0]
-                text = first_page.extract_text()
+                first_page = pdf_doc.load_page(0)
+                text = first_page.get_text()
                 st.write("Tekst z pierwszej strony:")
                 st.write(text if text else "Brak tekstu na pierwszej stronie.")
         except Exception as e:

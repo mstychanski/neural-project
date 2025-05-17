@@ -53,21 +53,22 @@ with st.sidebar:
     st.header("Menu")
     uploaded_files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
     if uploaded_files:
-        for uploaded_file in uploaded_files:
+        for idx, uploaded_file in enumerate(uploaded_files):
             try:
                 pdf_doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
                 num_pages = pdf_doc.page_count
-                # Pobierz tekst z pierwszej strony
                 if num_pages > 0:
                     first_page = pdf_doc.load_page(0)
                     text = first_page.get_text()
                 else:
                     text = "Brak stron w pliku."
-                # Wyświetl nazwę pliku z podglądem w tooltip (popup na hover)
-                st.markdown(
-                    f'<span title="{text.replace(chr(34), chr(39)).replace(chr(10), " ")}">{uploaded_file.name}</span> '
-                    f'({num_pages} stron)', 
-                    unsafe_allow_html=True
-                )
+                # Przycisk otwierający okno dialogowe z podglądem
+                st.write(f"{uploaded_file.name} ({num_pages} stron)")
+                if st.button(f"Podgląd", key=f"preview_{idx}"):
+                    with st.dialog(f"Podgląd: {uploaded_file.name}"):
+                        st.markdown(f"**Liczba stron:** {num_pages}")
+                        st.markdown("---")
+                        st.markdown(f"**Tekst z pierwszej strony:**")
+                        st.markdown(f"<div style='white-space: pre-wrap'>{text if text else 'Brak tekstu na pierwszej stronie.'}</div>", unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")

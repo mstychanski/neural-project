@@ -36,6 +36,8 @@ if prompt := st.chat_input("What is up?"):
         chat = ChatOpenRouter(
             model_name=st.secrets["MODEL"],
         )
+
+        st.write("Retrieving documents...", uploaded_files)
         # Jeśli są pliki PDF, użyj embeddingów i retrieval
         if uploaded_files:
             documents = []

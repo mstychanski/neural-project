@@ -35,15 +35,16 @@ if prompt := st.chat_input("What is up?"):
             message_placeholder.markdown("Thinking" + "." * (i % 4))
             time.sleep(0.5)
 
-            openAi =  ChatOpenAI(
-                model=st,
-                temperature=0,
-                max_tokens=None,
-                timeout=None,
-                max_retries=2,
-                api_key=st.secrets["API_KEY"],
-                base_url=st.secrets["BASE_URL"]
-            )
+        # Poprawiona inicjalizacja ChatOpenAI
+        openAi = ChatOpenAI(
+            model=st.secrets["MODEL"],
+            temperature=0,
+            max_tokens=None,
+            timeout=None,
+            max_retries=2,
+            openai_api_key=st.secrets["API_KEY"],
+            base_url=st.secrets["BASE_URL"]
+        )
         # Jeśli są pliki PDF, użyj embeddingów i retrieval
         if uploaded_files:
             documents = []

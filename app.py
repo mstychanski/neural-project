@@ -76,7 +76,6 @@ with st.sidebar:
         for idx, uploaded_file in enumerate(files):
             try:
                 info = extract_pdf_info(uploaded_file)
-                info["idx"] = idx
                 file_infos.append(info)
                 st.write(f"{info['name']} ({info['num_pages']} stron)")
                 if st.button(f"Podgląd", key=f"preview_{idx}"):
@@ -86,8 +85,7 @@ with st.sidebar:
 
         if st.session_state.dialog_open is not None:
             info = file_infos[st.session_state.dialog_open]
-            st.markdown(f"### Podgląd: {info['name']}")
-            st.markdown(f"**Liczba stron:** {info['num_pages']}")
+            st.markdown(f"### Podgląd: {info['filename']}")
             st.markdown("---")
             st.markdown("**Tekst z pierwszej strony:**")
             st.markdown(f"<div style='white-space: pre-wrap'>{info['text'] if info['text'] else 'Brak tekstu na pierwszej stronie.'}</div>", unsafe_allow_html=True)

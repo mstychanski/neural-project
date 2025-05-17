@@ -22,16 +22,8 @@ def get_ai_response(messages, secrets, documents=None, model=None):
         return assistant_response.choices[0].message.content
 
 
-def answer_question(question, documents, model):
+def answer_question(question, documents, model, template):
 
-
-    template = """
-        You are a helpful assistant. Answer the question based on the context provided. Answer in Polish by default.
-        If the question is not answerable based on the context, say "I don't know".
-        Context: {context}
-        Question: {question}
-        Answer:
-    """
 
     context = "\n\n".join([doc["text"] for doc in documents])
     prompt = ChatPromptTemplate.from_template(template)

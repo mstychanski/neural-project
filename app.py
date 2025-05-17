@@ -3,9 +3,8 @@ import random
 import time
 from pdf_utils import extract_pdf_info
 from chat_openrouter import ChatOpenRouter
-from langchain.prompts import ChatPromptTemplate
-from embedder import FAISSIndex  # zakładamy, że FAISSIndex jest w embedder.py
-from langchain_openai import ChatOpenAI
+from embedder import *  # zakładamy, że FAISSIndex jest w embedder.py
+from ai_model import answer_question
 
 st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
 
@@ -50,32 +49,25 @@ if prompt := st.chat_input("What is up?"):
                     st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")
 
             # Tworzenie indeksu FAISS i retrieval
-            embedder = FAISSIndex.create_index(documents)
-            retrieved_docs = embedder.retrieve_docs(prompt, k=3)
+            index = FAISSIndex.create_index(documents)
+            retrieved_docs = embedder.retrieve_docs(prompt, index)
             context = "\n\n".join([doc["text"] for doc in retrieved_docs if doc.get("text")])
 
             template = """
                     You are a helpful assistant. Answer the question based on the context provided. Answer in Polish by default.
                     If the question is not answerable based on the context, say "I don't know".
                     Context: {context}
-                    Question: {question}
+                    Question: {prompt}
                     Answer:
                 """
-            prompt_text = template.format(context=context, question=prompt)
 
-
+            response = answer_question(prompt, retrieved_docs, chat, template)     
             
-            response = chat.chat.completions.create(
-                model=st.secrets["MODEL"],
-                messages=[{"role": "user", "content": prompt_text}]
-            )
-            full_response = response.choices[0].message.content
 
 
-        message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+        message_placeholder.markdown(response)
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
-# Dodaj side nav menu i przenieś upload PDF do sidebara
 with st.sidebar:
     st.header("Menu")
     uploaded_files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)

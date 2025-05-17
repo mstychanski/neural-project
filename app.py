@@ -53,6 +53,9 @@ with st.sidebar:
     st.header("Menu")
     uploaded_files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
     if uploaded_files:
+        if "dialog_open" not in st.session_state:
+            st.session_state.dialog_open = None
+        file_infos = []
         for idx, uploaded_file in enumerate(uploaded_files):
             try:
                 pdf_doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
@@ -62,13 +65,25 @@ with st.sidebar:
                     text = first_page.get_text()
                 else:
                     text = "Brak stron w pliku."
-                # Przycisk otwierający okno dialogowe z podglądem
+                file_infos.append({
+                    "idx": idx,
+                    "name": uploaded_file.name,
+                    "num_pages": num_pages,
+                    "text": text
+                })
                 st.write(f"{uploaded_file.name} ({num_pages} stron)")
                 if st.button(f"Podgląd", key=f"preview_{idx}"):
-                    with st.dialog(f"Podgląd: {uploaded_file.name}"):
-                        st.markdown(f"**Liczba stron:** {num_pages}")
-                        st.markdown("---")
-                        st.markdown(f"**Tekst z pierwszej strony:**")
-                        st.markdown(f"<div style='white-space: pre-wrap'>{text if text else 'Brak tekstu na pierwszej stronie.'}</div>", unsafe_allow_html=True)
+                    st.session_state.dialog_open = idx
             except Exception as e:
                 st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")
+
+        # Wyświetl okno dialogowe jeśli wybrano plik do podglądu
+        if st.session_state.dialog_open is not None:
+            info = file_infos[st.session_state.dialog_open]
+            st.markdown(f"### Podgląd: {info['name']}")
+            st.markdown(f"**Liczba stron:** {info['num_pages']}")
+            st.markdown("---")
+            st.markdown("**Tekst z pierwszej strony:**")
+            st.markdown(f"<div style='white-space: pre-wrap'>{info['text'] if info['text'] else 'Brak tekstu na pierwszej stronie.'}</div>", unsafe_allow_html=True)
+            if st.button("Zamknij podgląd", key="close_dialog"):
+                st.session_state.dialog_open = None

@@ -5,6 +5,7 @@ from pdf_utils import extract_pdf_info
 from chat_openrouter import ChatOpenRouter
 from langchain.prompts import ChatPromptTemplate
 from embedder import FAISSIndex  # zakładamy, że FAISSIndex jest w embedder.py
+from langchain_openai import ChatOpenAI
 
 st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
 
@@ -34,6 +35,15 @@ if prompt := st.chat_input("What is up?"):
             message_placeholder.markdown("Thinking" + "." * (i % 4))
             time.sleep(0.5)
 
+            openAi =  ChatOpenAI(
+                model=st,
+                temperature=0,
+                max_tokens=None,
+                timeout=None,
+                max_retries=2,
+                api_key=st.secrets["API_KEY"],
+                base_url=st.secrets["BASE_URL"]
+            )
         # Jeśli są pliki PDF, użyj embeddingów i retrieval
         if uploaded_files:
             documents = []
@@ -59,10 +69,8 @@ if prompt := st.chat_input("What is up?"):
             prompt_text = template.format(context=context, question=prompt)
 
             # Użycie ChatOpenRouter do wygenerowania odpowiedzi
-            chat = ChatOpenRouter(
-                openai_api_key=st.secrets["API_KEY"],
-                base_url=st.secrets["BASE_URL"],
-                model=st.secrets["MODEL"]
+
+            chat = ChatOpenRouter(openAi
             )
             response = chat.chat.completions.create(
                 model=st.secrets["MODEL"],
@@ -71,10 +79,8 @@ if prompt := st.chat_input("What is up?"):
             full_response = response.choices[0].message.content
         else:
             # Fallback do klasycznego OpenAI
-            client = ChatOpenRouter(
-                openai_api_key=st.secrets["API_KEY"],
-                base_url=st.secrets["BASE_URL"],
-                model=st.secrets["MODEL"]
+
+            client = ChatOpenRouter(openAi
             )
             assistant_response = client.chat.completions.create(
                 model=st.secrets["MODEL"],

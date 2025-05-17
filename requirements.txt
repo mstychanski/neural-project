@@ -5,3 +5,6 @@ HuggingFaceEmbeddings
 Faiss
 langchain_openai
 pydantic
+streamlit
+streamlit-chat
+streamlit-extras

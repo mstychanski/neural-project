@@ -48,7 +48,7 @@ if prompt := st.chat_input("What is up?"):
                     data.append(info)
                 except Exception as e:
                     st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")
-
+            print(f"Extracted data: {data}")
             index = create_index(data)
             retrieved_docs = retrieve_docs(prompt, index)
             context = "\n\n".join([doc["text"] for doc in retrieved_docs if doc.get("text")])
@@ -75,7 +75,7 @@ with st.sidebar:
     st.header("Menu")
     files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
     if files:
-        st.session_state.files = files  # zapisz pliki globalnie
+        st.session_state.files = files  
         if "dialog_open" not in st.session_state:
             st.session_state.dialog_open = None
 

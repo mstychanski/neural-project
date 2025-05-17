@@ -11,7 +11,8 @@ st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.stre
 st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
 
 
-files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
+files = None
+file_infos = []
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": "Let's start chatting! 👇"}]
@@ -73,7 +74,7 @@ if prompt := st.chat_input("What is up?"):
            st.write("No files uploaded. Please upload PDF files to retrieve information.")
 with st.sidebar:
     st.header("Menu")
-    file_infos = []
+    files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
     if files:
         if "dialog_open" not in st.session_state:
             st.session_state.dialog_open = None

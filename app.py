@@ -60,13 +60,13 @@ if prompt := st.chat_input("What is up?"):
                 """
             print(f"Retrieved documents: {retrieved_docs}")
             # Wykonanie zapytania do modelu
-            
+            st.write("Retrieving documents...")
 
             response = answer_question(prompt, retrieved_docs, chat, template)     
             st.session_state.messages.append({"role": "assistant", "content": response})
             # write to console
             st.write(f"Assistant: {response}")
-            st.chat_message("assistant").write(response)
+            st.write(response)
 with st.sidebar:
     st.header("Menu")
     uploaded_files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)

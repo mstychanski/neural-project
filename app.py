@@ -77,7 +77,7 @@ with st.sidebar:
             try:
                 info = extract_pdf_info(uploaded_file)
                 file_infos.append(info)
-                st.write(f"{info['name']} ({info['num_pages']} stron)")
+                st.write(f"{info['filename']}")
                 if st.button(f"Podgląd", key=f"preview_{idx}"):
                     st.session_state.dialog_open = idx
             except Exception as e:

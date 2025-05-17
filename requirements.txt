@@ -1,5 +1,6 @@
 openai
 PyMuPDF
+langchain
 langchain_huggingface
 faiss-cpu
 langchain_openai

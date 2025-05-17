@@ -1,6 +1,6 @@
 openai
 PyMuPDF
-HuggingFaceEmbeddings
+langchain_huggingface
 Faiss
 langchain_openai
 pydantic

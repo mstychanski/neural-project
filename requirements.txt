@@ -1,7 +1,7 @@
 openai
 PyMuPDF
 langchain_huggingface
-Faiss
+faiss-cpu
 langchain_openai
 pydantic
 streamlit

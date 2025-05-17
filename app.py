@@ -1,17 +1,14 @@
 import streamlit as st
 import random
 import time
-from openai import OpenAI
-import fitz  # zamiast PyPDF2
-#import langchain_community  # dodano import langchain_community
+from pdf_utils import extract_pdf_info  # import logiki biznesowej
+from ai_model import get_ai_response    # import obsługi modelu AI
 
 st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
 
 st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
 
 
-
-client = OpenAI(api_key = st.secrets["API_KEY"], base_url=st.secrets["BASE_URL"])
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -24,28 +21,19 @@ for message in st.session_state.messages:
 
 # Accept user input
 if prompt := st.chat_input("What is up?"):
-    # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
-    # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Display assistant response in chat message container
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-
- # Show waiting dots animation
-        for i in range(5):  # Adjust the range for longer/shorter animations
+        for i in range(5):
             message_placeholder.markdown("Thinking" + "." * (i % 4))
             time.sleep(0.5)
 
-        assistant_response = client.chat.completions.create(
-            model=st.secrets["MODEL"],
-            messages=st.session_state.messages
-        )
-        full_response = assistant_response.choices[0].message.content
+        # Użyj wydzielonej funkcji do uzyskania odpowiedzi AI
+        full_response = get_ai_response(st.session_state.messages, st.secrets)
         message_placeholder.markdown(full_response)
-    # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # Dodaj side nav menu i przenieś upload PDF do sidebara
@@ -58,20 +46,10 @@ with st.sidebar:
         file_infos = []
         for idx, uploaded_file in enumerate(uploaded_files):
             try:
-                pdf_doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
-                num_pages = pdf_doc.page_count
-                if num_pages > 0:
-                    first_page = pdf_doc.load_page(0)
-                    text = first_page.get_text()
-                else:
-                    text = "Brak stron w pliku."
-                file_infos.append({
-                    "idx": idx,
-                    "name": uploaded_file.name,
-                    "num_pages": num_pages,
-                    "text": text
-                })
-                st.write(f"{uploaded_file.name} ({num_pages} stron)")
+                info = extract_pdf_info(uploaded_file)
+                info["idx"] = idx
+                file_infos.append(info)
+                st.write(f"{info['name']} ({info['num_pages']} stron)")
                 if st.button(f"Podgląd", key=f"preview_{idx}"):
                     st.session_state.dialog_open = idx
             except Exception as e:

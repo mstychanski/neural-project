@@ -30,9 +30,6 @@ if prompt := st.chat_input("What is up?"):
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        for i in range(5):
-            message_placeholder.markdown("Thinking" + "." * (i % 4))
-            time.sleep(0.5)
 
         # Poprawiona inicjalizacja ChatOpenAI
         chat = ChatOpenRouter(
@@ -60,7 +57,10 @@ if prompt := st.chat_input("What is up?"):
                     Question: {prompt}
                     Answer:
                 """
-
+            print(f"Retrieved documents: {retrieved_docs}")
+            # Wykonanie zapytania do modelu
+            
+            
             response = answer_question(prompt, retrieved_docs, chat, template)     
             st.session_state.messages.append({"role": "assistant", "content": response})
             # write to console

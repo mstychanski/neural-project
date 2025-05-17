@@ -11,7 +11,10 @@ st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.stre
 st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
 
 
-files = None
+# Zainicjuj globalną listę plików w session_state
+if "files" not in st.session_state:
+    st.session_state.files = None
+
 file_infos = []
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -31,24 +34,21 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         st.write("Thinking...")
-        
-        # Poprawiona inicjalizacja ChatOpenAI
+
         chat = ChatOpenRouter(
             model_name=st.secrets["MODEL"],
         )
 
-        st.write("Retrieving documents...", files)
-        # Jeśli są pliki PDF, użyj embeddingów i retrieval
-        if files:
+        st.write("Retrieving documents...", st.session_state.files)
+        if st.session_state.files:
             documents = []
-            for uploaded_file in files:
+            for uploaded_file in st.session_state.files:
                 try:
                     info = extract_pdf_info(uploaded_file)
                     documents.append(info)
                 except Exception as e:
                     st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")
 
-            # Tworzenie indeksu FAISS i retrieval
             index = create_index(documents)
             retrieved_docs = retrieve_docs(prompt, index)
             context = "\n\n".join([doc["text"] for doc in retrieved_docs if doc.get("text")])
@@ -61,21 +61,21 @@ if prompt := st.chat_input("What is up?"):
                     Answer:
                 """
             print(f"Retrieved documents: {retrieved_docs}")
-            # Wykonanie zapytania do modelu
             st.write("Retrieving documents...")
 
             response = answer_question(prompt, retrieved_docs, chat, template)     
             st.session_state.messages.append({"role": "assistant", "content": response})
-            # write to console
             st.write(f"Assistant: {response}")
             st.write(response)
 
         else:
            st.write("No files uploaded. Please upload PDF files to retrieve information.")
+
 with st.sidebar:
     st.header("Menu")
     files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
     if files:
+        st.session_state.files = files  # zapisz pliki globalnie
         if "dialog_open" not in st.session_state:
             st.session_state.dialog_open = None
 
@@ -90,7 +90,6 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")
 
-        # Wyświetl okno dialogowe jeśli wybrano plik do podglądu
         if st.session_state.dialog_open is not None:
             info = file_infos[st.session_state.dialog_open]
             st.markdown(f"### Podgląd: {info['name']}")

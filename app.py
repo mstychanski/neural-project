@@ -10,7 +10,7 @@ st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.stre
 
 st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
 
-uploaded_files = None
+
 
 
 # Initialize chat history
@@ -37,11 +37,11 @@ if prompt := st.chat_input("What is up?"):
             model_name=st.secrets["MODEL"],
         )
 
-        st.write("Retrieving documents...", uploaded_files)
+        st.write("Retrieving documents...", files)
         # Jeśli są pliki PDF, użyj embeddingów i retrieval
-        if uploaded_files:
+        if files:
             documents = []
-            for uploaded_file in uploaded_files:
+            for uploaded_file in files:
                 try:
                     info = extract_pdf_info(uploaded_file)
                     documents.append(info)
@@ -69,14 +69,17 @@ if prompt := st.chat_input("What is up?"):
             # write to console
             st.write(f"Assistant: {response}")
             st.write(response)
+
+        else:
+           st.write("No files uploaded. Please upload PDF files to retrieve information.")
 with st.sidebar:
     st.header("Menu")
-    uploaded_files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
-    if uploaded_files:
+    files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
+    if files:
         if "dialog_open" not in st.session_state:
             st.session_state.dialog_open = None
         file_infos = []
-        for idx, uploaded_file in enumerate(uploaded_files):
+        for idx, uploaded_file in enumerate(files):
             try:
                 info = extract_pdf_info(uploaded_file)
                 info["idx"] = idx

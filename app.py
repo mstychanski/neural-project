@@ -47,18 +47,20 @@ if prompt := st.chat_input("What is up?"):
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-# Dodaj przycisk do uploadowania pliku PDF
-uploaded_file = st.file_uploader("Wgraj plik PDF", type=["pdf"])
-if uploaded_file is not None:
-    try:
-        pdf_reader = PdfReader(uploaded_file)
-        num_pages = len(pdf_reader.pages)
-        st.success(f"Plik PDF został wczytany. Liczba stron: {num_pages}")
-        # Przykładowo: wyświetl tekst z pierwszej strony
-        if num_pages > 0:
-            first_page = pdf_reader.pages[0]
-            text = first_page.extract_text()
-            st.write("Tekst z pierwszej strony:")
-            st.write(text if text else "Brak tekstu na pierwszej stronie.")
-    except Exception as e:
-        st.error(f"Błąd podczas przetwarzania pliku PDF: {e}")
+# Dodaj side nav menu i przenieś upload PDF do sidebara
+with st.sidebar:
+    st.header("Menu")
+    uploaded_file = st.file_uploader("Wgraj plik PDF", type=["pdf"])
+    if uploaded_file is not None:
+        try:
+            pdf_reader = PdfReader(uploaded_file)
+            num_pages = len(pdf_reader.pages)
+            st.success(f"Plik PDF został wczytany. Liczba stron: {num_pages}")
+            # Przykładowo: wyświetl tekst z pierwszej strony
+            if num_pages > 0:
+                first_page = pdf_reader.pages[0]
+                text = first_page.extract_text()
+                st.write("Tekst z pierwszej strony:")
+                st.write(text if text else "Brak tekstu na pierwszej stronie.")
+        except Exception as e:
+            st.error(f"Błąd podczas przetwarzania pliku PDF: {e}")

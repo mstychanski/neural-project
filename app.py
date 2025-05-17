@@ -3,7 +3,7 @@ import random
 import time
 from openai import OpenAI
 import fitz  # zamiast PyPDF2
-import langchain_community  # dodano import langchain_community
+#import langchain_community  # dodano import langchain_community
 
 st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
 

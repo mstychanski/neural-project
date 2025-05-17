@@ -64,11 +64,23 @@ if prompt := st.chat_input("What is up?"):
                 base_url=st.secrets["BASE_URL"],
                 model=st.secrets["MODEL"]
             )
-            response = chat.invoke(prompt_text)
-            full_response = response.content if hasattr(response, "content") else str(response)
+            response = chat.chat.completions.create(
+                model=st.secrets["MODEL"],
+                messages=[{"role": "user", "content": prompt_text}]
+            )
+            full_response = response.choices[0].message.content
         else:
-            # fallback do klasycznego modelu (jeśli nie ma plików)
-            full_response = get_ai_response(st.session_state.messages, st.secrets)
+            # Fallback do klasycznego OpenAI
+            client = ChatOpenRouter(
+                openai_api_key=st.secrets["API_KEY"],
+                base_url=st.secrets["BASE_URL"],
+                model=st.secrets["MODEL"]
+            )
+            assistant_response = client.chat.completions.create(
+                model=st.secrets["MODEL"],
+                messages=[{"role": "user", "content": prompt}]
+            )
+            full_response = assistant_response.choices[0].message.content
 
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})

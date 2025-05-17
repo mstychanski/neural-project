@@ -1,7 +1,7 @@
 import streamlit as st
 import random
 import time
-from pdf_utils import extract_pdf_info
+from pdf_utils import *
 from chat_openrouter import ChatOpenRouter
 from embedder import *  # zakładamy, że FAISSIndex jest w embedder.py
 from ai_model import answer_question
@@ -44,7 +44,7 @@ if prompt := st.chat_input("What is up?"):
             data = []
             for uploaded_file in st.session_state.files:
                 try:
-                    info = extract_pdf_info(uploaded_file)
+                    info = load_pdf(uploaded_file)
                     data.append(info)
                 except Exception as e:
                     st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")

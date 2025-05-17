@@ -41,7 +41,13 @@ if prompt := st.chat_input("What is up?"):
 
         st.write("Retrieving documents...", st.session_state.files)
         if st.session_state.files:
-
+            data = []
+            for uploaded_file in st.session_state.files:
+                try:
+                    info = extract_pdf_info(uploaded_file)
+                    data.append(info)
+                except Exception as e:
+                    st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")
 
             index = create_index(file_infos)
             retrieved_docs = retrieve_docs(prompt, index)

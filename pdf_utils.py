@@ -9,7 +9,6 @@ def extract_pdf_info(uploaded_file):
     else:
         text = "Brak stron w pliku."
     return {
-        "name": uploaded_file.name,
-        "num_pages": num_pages,
+        "filename": uploaded_file.name,
         "text": text
     }

@@ -1,7 +1,6 @@
 import fitz
 
 def extract_pdf_info(uploaded_file):
-    # Sprawdź, czy plik nie jest pusty
     if getattr(uploaded_file, "size", None) == 0:
         return {
             "filename": uploaded_file.name,

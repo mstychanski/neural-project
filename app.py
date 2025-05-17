@@ -3,6 +3,7 @@ import random
 import time
 from openai import OpenAI
 import fitz  # zamiast PyPDF2
+import langchain_community  # dodano import langchain_community
 
 st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
 
@@ -50,17 +51,23 @@ if prompt := st.chat_input("What is up?"):
 # Dodaj side nav menu i przenieś upload PDF do sidebara
 with st.sidebar:
     st.header("Menu")
-    uploaded_file = st.file_uploader("Wgraj plik PDF", type=["pdf"])
-    if uploaded_file is not None:
-        try:
-            pdf_doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
-            num_pages = pdf_doc.page_count
-            st.success(f"Plik PDF został wczytany. Liczba stron: {num_pages}")
-            # Przykładowo: wyświetl tekst z pierwszej strony
-            if num_pages > 0:
-                first_page = pdf_doc.load_page(0)
-                text = first_page.get_text()
-                st.write("Tekst z pierwszej strony:")
-                st.write(text if text else "Brak tekstu na pierwszej stronie.")
-        except Exception as e:
-            st.error(f"Błąd podczas przetwarzania pliku PDF: {e}")
+    uploaded_files = st.file_uploader("Wgraj pliki PDF", type=["pdf"], accept_multiple_files=True)
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            try:
+                pdf_doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+                num_pages = pdf_doc.page_count
+                # Pobierz tekst z pierwszej strony
+                if num_pages > 0:
+                    first_page = pdf_doc.load_page(0)
+                    text = first_page.get_text()
+                else:
+                    text = "Brak stron w pliku."
+                # Wyświetl nazwę pliku z podglądem w tooltip (popup na hover)
+                st.markdown(
+                    f'<span title="{text.replace(chr(34), chr(39)).replace(chr(10), " ")}">{uploaded_file.name}</span> '
+                    f'({num_pages} stron)', 
+                    unsafe_allow_html=True
+                )
+            except Exception as e:
+                st.error(f"Błąd podczas przetwarzania pliku {uploaded_file.name}: {e}")

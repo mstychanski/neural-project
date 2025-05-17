@@ -11,7 +11,7 @@ st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.stre
 st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
 
 
-
+files = None
 
 # Initialize chat history
 if "messages" not in st.session_state:
